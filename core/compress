@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# compress — Johnny prompt compressor using local Ollama
+# Usage: compress "your verbose prompt here"
+#        echo "your verbose prompt" | compress
+#        compress < file.txt
+#
+# Options:
+#   -v   Show before/after with token estimate
+#   -c   Copy compressed output to clipboard (macOS)
+#   -n   Dry run — show compressed but don't copy
+
+set -euo pipefail
+
+MODEL="johnny"
+VERBOSE=false
+COPY=false
+DRYRUN=false
+
+while getopts "vcn" opt; do
+  case $opt in
+    v) VERBOSE=true ;;
+    c) COPY=true ;;
+    n) DRYRUN=true ;;
+    *) echo "Usage: compress [-v] [-c] [-n] [prompt]" >&2; exit 1 ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+# Get input from args or stdin
+if [ $# -gt 0 ]; then
+  INPUT="$*"
+else
+  INPUT=$(cat)
+fi
+
+if [ -z "$INPUT" ]; then
+  echo "Error: No input provided" >&2
+  exit 1
+fi
+
+# Estimate tokens (rough: words * 1.3)
+input_words=$(echo "$INPUT" | wc -w | tr -d ' ')
+input_tokens_est=$(echo "$input_words * 1.3" | bc | cut -d. -f1)
+
+# Compress via Ollama
+COMPRESSED=$(echo "$INPUT" | ollama run "$MODEL" 2>/dev/null)
+
+# Strip any quotes the model might wrap around output
+COMPRESSED=$(echo "$COMPRESSED" | sed 's/^["'"'"']//;s/["'"'"']$//')
+
+output_words=$(echo "$COMPRESSED" | wc -w | tr -d ' ')
+output_tokens_est=$(echo "$output_words * 1.3" | bc | cut -d. -f1)
+
+if $VERBOSE; then
+  if [ "$input_tokens_est" -gt 0 ] 2>/dev/null; then
+    ratio=$(echo "scale=1; (1 - $output_tokens_est / $input_tokens_est) * 100" | bc)
+  else
+    ratio="?"
+  fi
+  echo "─── ORIGINAL ($input_tokens_est tok est) ───"
+  echo "$INPUT"
+  echo ""
+  echo "─── COMPRESSED ($output_tokens_est tok est, ${ratio}% reduction) ───"
+  echo "$COMPRESSED"
+else
+  echo "$COMPRESSED"
+fi
+
+# Copy to clipboard on macOS
+if $COPY && ! $DRYRUN; then
+  if command -v pbcopy &>/dev/null; then
+    echo -n "$COMPRESSED" | pbcopy
+    $VERBOSE && echo -e "\n✓ Copied to clipboard"
+  fi
+fi

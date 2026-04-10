@@ -1,0 +1,46 @@
+{
+  "id": "johnny",
+  "name": "Johnny",
+  "description": "Prompt compression via local Ollama model — compresses verbose text into minimal shorthand tokens, saving API input costs. Named after Johnny Mnemonic.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "autoCompress": {
+        "type": "boolean",
+        "default": false
+      },
+      "minTokenThreshold": {
+        "type": "number",
+        "minimum": 0,
+        "default": 50
+      },
+      "ollamaBaseUrl": {
+        "type": "string",
+        "default": "http://127.0.0.1:11434"
+      },
+      "model": {
+        "type": "string",
+        "default": "johnny"
+      }
+    }
+  },
+  "uiHints": {
+    "autoCompress": {
+      "label": "Auto-Compress",
+      "help": "Automatically compress user messages before sending to the LLM."
+    },
+    "minTokenThreshold": {
+      "label": "Min Token Threshold",
+      "help": "Skip compression for messages with fewer estimated tokens than this."
+    },
+    "ollamaBaseUrl": {
+      "label": "Ollama Base URL",
+      "help": "Ollama HTTP API base URL. Auto-resolves to host.docker.internal when running in Docker."
+    },
+    "model": {
+      "label": "Ollama Model",
+      "help": "Ollama model name for prompt compression (create with: ollama create johnny -f Modelfile)."
+    }
+  }
+}

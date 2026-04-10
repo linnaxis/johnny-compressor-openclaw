@@ -1,0 +1,22 @@
+{
+  "name": "johnny-compressor-openclaw",
+  "version": "0.1.0",
+  "description": "Local prompt compression via Ollama — named after Johnny Mnemonic",
+  "type": "module",
+  "scripts": {
+    "model:create": "ollama create johnny -f core/Modelfile",
+    "model:test": "echo 'Can you please check my email and if there is anything new, summarize the key points and send me a brief overview?' | ollama run johnny",
+    "eval": "npx tsx openclaw/eval/eval-compression.ts",
+    "eval:full": "npx tsx openclaw/eval/eval-full.ts",
+    "eval:roundtrip": "npx tsx openclaw/eval/eval-roundtrip.ts",
+    "eval:system-prompt": "npx tsx openclaw/eval/eval-system-prompt.ts",
+    "test": "vitest run openclaw/index.test.ts"
+  },
+  "devDependencies": {
+    "@sinclair/typebox": "0.34.48",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.0"
+  },
+  "license": "MIT"
+}
