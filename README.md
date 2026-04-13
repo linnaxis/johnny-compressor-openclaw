@@ -1,7 +1,7 @@
 # 🦞 Johnny
 
 <p align="center">
-  <img src="jonhnny.png" alt="Johnny" width="400">
+  <img src="johnny.png" alt="Johnny" width="400">
 </p>
 
 Local prompt compression via [Ollama](https://ollama.com). Compresses verbose natural-language prompts into minimal shorthand tokens, reducing API input costs by 60-90%.
